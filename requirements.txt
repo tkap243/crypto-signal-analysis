@@ -1,0 +1,14 @@
+langgraph
+tavily-python
+ccxt
+pandas
+numpy
+python-dateutil
+pytz
+python-dotenv
+openai
+schedule
+matplotlib
+seaborn
+jupyter
+ipykernel

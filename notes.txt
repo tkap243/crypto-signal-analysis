@@ -1,0 +1,5 @@
+sources to consider: Twitter/X sentiment: Still extremely alpha-rich for crypto. A single influential account (e.g., Musk, CZ, SEC) can move BTC. Tavily’s websearch may capture some, but usually it prioritizes articles/blogs. For raw social chatter, I’d suggest direct X API scrapes or a service like LunarCrush.
+
+On-chain data: Whale movements, exchange inflows/outflows, funding rates. These are some of the most predictive short-term signals.
+
+Order book / derivatives data: Open interest, liquidations, futures basis. High-frequency funds live on this data, but even coarse signals (e.g., spikes in OI + funding flips) can be predictive.

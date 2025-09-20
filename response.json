@@ -1,0 +1,1 @@
+{"errorMessage": "Unable to import module 'lambda_handler': No module named 'botocore.docs'", "errorType": "Runtime.ImportModuleError", "requestId": "", "stackTrace": []}

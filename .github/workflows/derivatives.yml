@@ -37,6 +37,17 @@ jobs:
       run: |
         python scripts/run_derivatives.py single
         
+    - name: Upload Derivative Data Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: derivative-data-${{ github.run_number }}
+        path: |
+          data/raw/derivative_data.csv
+          data/processed/derivative_features.csv
+          data/outputs/derivative_signals.json
+          data/outputs/reports/derivative_report.md
+        retention-days: 30  # Keep artifacts for 30 days
+        
     - name: Commit and push data
       run: |
         git config --local user.email "action@github.com"

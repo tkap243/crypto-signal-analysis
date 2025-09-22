@@ -92,7 +92,7 @@ jupyter notebook notebooks/
 - **GitHub Actions**: Automated execution every 4 hours
 
 ### Order Book Script (AlphaCrypto_OrderBook.py)
-- **Frequency**: Every 15 seconds (data collection), 15 minutes (analysis)
+- **Frequency**: Every 1 minute (data collection), 5 minutes (analysis)
 - **Data Sources**: Coinbase, Kraken, Bitfinex (order book + trades)
 - **Outputs**: Order book data, trade data, features, signals
 - **Status**: Development/testing phase

@@ -28,12 +28,12 @@ load_dotenv()
 class OrderBookConfig:
     symbol: str = "BTC/USDT"
     prediction_hours: float = 1.0  # 1-hour predictions
-    data_collection_interval: int = 15  # 15 seconds
+    data_collection_interval: int = 60  # 60 seconds (1 minute)
     feature_window_minutes: int = 5  # 5-minute rolling windows
-    signal_update_minutes: int = 15  # Update signals every 15 minutes
+    signal_update_minutes: int = 5  # Update signals every 5 minutes
     orderbook_depth: int = 20  # Top 20 bid/ask levels
     trades_limit: int = 100  # Last 100 trades
-    max_data_points: int = 240  # 1 hour of 15-second data
+    max_data_points: int = 60  # 1 hour of 1-minute data
     
     # Output files
     orderbook_data_file: str = "data/raw/orderbook_data.csv"
@@ -387,13 +387,13 @@ class OrderBookFeatureEngine:
             # Simple approximation: compare current vs previous order book depth
             current_depth = len(orderbook.bids) + len(orderbook.asks)
             prev_depth = len(recent_orderbooks[-2].bids) + len(recent_orderbooks[-2].asks)
-            order_flow_rate = (current_depth - prev_depth) / 15.0  # Per second (15s intervals)
+            order_flow_rate = (current_depth - prev_depth) / 60.0  # Per second (60s intervals)
             
             # Cancellation rate (negative order flow)
-            cancellation_rate = max(0, -order_flow_rate) / 15.0
+            cancellation_rate = max(0, -order_flow_rate) / 60.0
             
             # New order rate (positive order flow)
-            new_order_rate = max(0, order_flow_rate) / 15.0
+            new_order_rate = max(0, order_flow_rate) / 60.0
         else:
             order_flow_rate = 0.0
             cancellation_rate = 0.0
@@ -751,6 +751,7 @@ class OrderBookApp:
         """Start continuous data collection and analysis"""
         print(f"🚀 Starting Order Book Data Collection")
         print(f"Collection interval: {self.config.data_collection_interval} seconds")
+        print(f"Signal updates: every {self.config.signal_update_minutes} minutes")
         print(f"Prediction window: {self.config.prediction_hours} hours")
         print(f"Press Ctrl+C to stop")
         print(f"{'='*60}")

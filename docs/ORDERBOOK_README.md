@@ -4,11 +4,11 @@
 This script analyzes order book and trade data to generate 1-hour BTC price predictions. It runs independently from your main sentiment+TA script and collects high-frequency market microstructure data.
 
 ## Features
-- **Data Collection**: Order book and trade data every 15 seconds
+- **Data Collection**: Order book and trade data every 5 minutes
 - **21 Microstructure Features**: Imbalance, spread, trade flow, price impact, momentum
 - **1-Hour Predictions**: Optimized for short-term market movements
 - **Multi-Exchange Support**: Coinbase, Kraken, Bitfinex (Bybit blocked in some regions)
-- **Real-time Analysis**: Updates every 15 minutes
+- **Real-time Analysis**: Updates every 5 minutes
 
 ## Usage
 

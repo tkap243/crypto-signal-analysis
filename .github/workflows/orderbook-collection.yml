@@ -2,8 +2,8 @@ name: Order Book Microstructure Analysis
 
 on:
   schedule:
-    # Run every 1 minute for data collection and analysis
-    - cron: '* * * * *'
+    # Run every 5 minutes for data collection and analysis
+    - cron: '*/5 * * * *'
   workflow_dispatch: # Allow manual runs
   push:
     branches: [ main ]

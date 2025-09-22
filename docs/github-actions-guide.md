@@ -6,7 +6,7 @@ This guide explains how to use GitHub Actions to run the order book data collect
 
 ### 1. **Order Book Microstructure Analysis** - Regular Collection
 - **File**: `orderbook-collection.yml`
-- **Schedule**: Every 1 minute
+- **Schedule**: Every 5 minutes
 - **Purpose**: Order book data collection and microstructure analysis
 - **Duration**: ~2 minutes per run
 - **Output**: Order book data, features, signals

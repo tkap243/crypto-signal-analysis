@@ -1,0 +1,43 @@
+name: Derivative Data Collection
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'  # Every 4 hours at minute 0
+  workflow_dispatch:  # Manual trigger option
+
+jobs:
+  collect-derivative-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Create data directories
+      run: |
+        mkdir -p data/raw
+        mkdir -p data/processed
+        mkdir -p data/outputs/reports
+        mkdir -p data/outputs/logs
+        
+    - name: Run derivative data collection
+      run: |
+        python scripts/run_derivatives.py single
+        
+    - name: Commit and push data
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/
+        git diff --staged --quiet || git commit -m "Update derivative data - $(date)"
+        git push

@@ -1,4 +1,4 @@
-name: Order Book Data Collection
+name: Order Book Microstructure Analysis
 
 on:
   schedule:

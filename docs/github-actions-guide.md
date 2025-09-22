@@ -4,21 +4,24 @@ This guide explains how to use GitHub Actions to run the order book data collect
 
 ## 🚀 Available Workflows
 
-### 1. **orderbook-collection.yml** - Regular Collection
+### 1. **Order Book Microstructure Analysis** - Regular Collection
+- **File**: `orderbook-collection.yml`
 - **Schedule**: Every 1 minute
-- **Purpose**: Regular data collection and analysis
+- **Purpose**: Order book data collection and microstructure analysis
 - **Duration**: ~2 minutes per run
 - **Output**: Order book data, features, signals
 
-### 2. **orderbook-extended.yml** - Extended Collection
+### 2. **Extended Order Book Microstructure Analysis** - Extended Collection
+- **File**: `orderbook-extended.yml`
 - **Trigger**: Manual only
-- **Purpose**: Long-duration data collection
+- **Purpose**: Long-duration order book data collection
 - **Duration**: 1-240 minutes (configurable)
-- **Output**: Extended dataset for analysis
+- **Output**: Extended microstructure dataset
 
-### 3. **bitcoin-signal.yml** - Production Sentiment+TA
+### 3. **Bitcoin Signal Analysis** - Production Sentiment+TA
+- **File**: `bitcoin-signal.yml`
 - **Schedule**: Every 4 hours
-- **Purpose**: Production sentiment analysis
+- **Purpose**: Production sentiment analysis and technical analysis
 - **Duration**: ~10 minutes per run
 - **Output**: BTC price predictions
 
@@ -39,13 +42,13 @@ The order book collection will run automatically every 15 minutes. No action nee
 
 #### **Regular Collection:**
 1. Go to **Actions** tab in GitHub
-2. Select **"Order Book Data Collection"**
+2. Select **"Order Book Microstructure Analysis"**
 3. Click **"Run workflow"**
 4. Click **"Run workflow"** button
 
 #### **Extended Collection:**
 1. Go to **Actions** tab in GitHub
-2. Select **"Extended Order Book Collection"**
+2. Select **"Extended Order Book Microstructure Analysis"**
 3. Click **"Run workflow"**
 4. Configure parameters:
    - **Collection duration**: 60 minutes (default)

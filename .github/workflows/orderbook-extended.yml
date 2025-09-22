@@ -1,4 +1,4 @@
-name: Extended Order Book Collection
+name: Extended Order Book Microstructure Analysis
 
 on:
   workflow_dispatch:

@@ -1,9 +1,9 @@
 {
-  "timestamp_utc": "2025-09-20T18:06:28.053963+00:00",
+  "timestamp_utc": "2025-09-22T15:48:25.288626+00:00",
   "symbol": "BTC/USDT",
-  "spot": 115730.33,
-  "direction": "Abstain",
-  "confidence": 0.25,
-  "sentiment": 0.08333333333333333,
-  "ta_label": "neutral"
+  "spot": 112616.3,
+  "direction": "Down",
+  "confidence": 0.6731786332903424,
+  "sentiment": -0.25,
+  "ta_label": "bearish"
 }

@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-09-22T15:45:16.932736+00:00",
+  "symbol": "BTC/USDT",
+  "prediction_hours": 1.0,
+  "direction": "bullish",
+  "confidence": 0.822939895783161,
+  "features": {
+    "timestamp": "2025-09-22T15:45:16.932736+00:00",
+    "symbol": "BTC/USDT",
+    "volume_imbalance": 0.06449470695272319,
+    "price_imbalance": 0.06426372037699625,
+    "depth_imbalance": 0.0,
+    "spread_absolute": 13.809999999997672,
+    "spread_relative": 0.00012250985523475848,
+    "spread_volatility": 0.0,
+    "order_flow_rate": 0.0,
+    "cancellation_rate": 0.0,
+    "new_order_rate": 0.0,
+    "trade_size_ratio": 0.0,
+    "buy_sell_pressure": -0.454808634321238,
+    "trade_frequency": 5.8808538999862785,
+    "large_trade_ratio": 0.0,
+    "price_impact_01": 2.385186045,
+    "price_impact_05": 2.385186045,
+    "liquidity_concentration": 0.045311477998354624,
+    "orderbook_momentum": 0.0,
+    "trade_momentum": 0.0,
+    "microstructure_momentum": 0.0
+  },
+  "reasoning": "Score: 0.161. buy_sell_pressure: -0.455 (bearish); price_impact_01: 2.385 (bullish)"
+}

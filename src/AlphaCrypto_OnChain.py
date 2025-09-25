@@ -159,25 +159,31 @@ class OnChainApp:
             # Check if running in GitHub Actions
             is_github_actions = os.getenv('GITHUB_ACTIONS') == 'true'
             
-            if is_github_actions:
-                print(f"🔄 GitHub Actions detected - starting with fresh data")
-                # In GitHub Actions, start fresh to avoid old data issues
-                return
-            
-            # Load raw data (only when not in GitHub Actions)
+            # Load raw data
             if os.path.exists(self.config.onchain_data_file):
                 df = pd.read_csv(self.config.onchain_data_file)
                 df['timestamp'] = pd.to_datetime(df['timestamp'], format='mixed')
+                
+                if is_github_actions:
+                    # In GitHub Actions, load only recent data (last 24 hours) for feature calculations
+                    cutoff_time = datetime.now(timezone.utc) - timedelta(hours=24)
+                    df = df[df['timestamp'] >= cutoff_time]
+                    print(f"🔄 GitHub Actions detected - loading recent data (last 24 hours)")
                 
                 for _, row in df.iterrows():
                     data = OnChainData(**{k: v for k, v in row.items() if k in OnChainData.__dataclass_fields__})
                     self.data_buffer.append(data)
                 print(f"📊 Loaded {len(self.data_buffer)} existing onchain data points")
             
-            # Load features (only when not in GitHub Actions)
+            # Load features
             if os.path.exists(self.config.features_file):
                 df = pd.read_csv(self.config.features_file)
                 df['timestamp'] = pd.to_datetime(df['timestamp'], format='mixed')
+                
+                if is_github_actions:
+                    # In GitHub Actions, load only recent features (last 24 hours)
+                    cutoff_time = datetime.now(timezone.utc) - timedelta(hours=24)
+                    df = df[df['timestamp'] >= cutoff_time]
                 
                 for _, row in df.iterrows():
                     features = OnChainFeatures(**{k: v for k, v in row.items() if k in OnChainFeatures.__dataclass_fields__})
@@ -551,29 +557,35 @@ class OnChainApp:
     def save_data(self):
         """Save all data to CSV files"""
         try:
-            # Save raw data - save all data points (overwrite file)
+            # Save raw data - append new data points
             if self.data_buffer:
-                data_list = []
+                # Get only new data points (not already saved)
+                new_data_points = []
                 for data in self.data_buffer:
                     data_dict = asdict(data)
                     data_dict['timestamp'] = data.timestamp.isoformat()
-                    data_list.append(data_dict)
+                    new_data_points.append(data_dict)
                 
-                df = pd.DataFrame(data_list)
-                df.to_csv(self.config.onchain_data_file, index=False)
-                print(f"💾 Saved {len(self.data_buffer)} onchain data points")
+                # Append to CSV file
+                df = pd.DataFrame(new_data_points)
+                file_exists = os.path.exists(self.config.onchain_data_file)
+                df.to_csv(self.config.onchain_data_file, mode='a', header=not file_exists, index=False)
+                print(f"💾 Saved {len(new_data_points)} new onchain data points")
             
-            # Save features - save all feature points (overwrite file)
+            # Save features - append new feature points
             if self.features_buffer:
-                features_list = []
+                # Get only new feature points (not already saved)
+                new_features_points = []
                 for features in self.features_buffer:
                     features_dict = asdict(features)
                     features_dict['timestamp'] = features.timestamp.isoformat()
-                    features_list.append(features_dict)
+                    new_features_points.append(features_dict)
                 
-                df = pd.DataFrame(features_list)
-                df.to_csv(self.config.features_file, index=False)
-                print(f"🔍 Saved {len(self.features_buffer)} feature points")
+                # Append to CSV file
+                df = pd.DataFrame(new_features_points)
+                file_exists = os.path.exists(self.config.features_file)
+                df.to_csv(self.config.features_file, mode='a', header=not file_exists, index=False)
+                print(f"🔍 Saved {len(new_features_points)} new feature points")
             
             # Save signals - overwrite the entire signals file (keep latest signals)
             if self.signals_buffer:

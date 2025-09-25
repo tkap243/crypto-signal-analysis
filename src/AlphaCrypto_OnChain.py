@@ -532,21 +532,38 @@ class OnChainApp:
     
     def save_data(self):
         """Save all data to CSV files"""
-        # Save raw data
+        # Save raw data - only save new data points
         if self.data_buffer:
-            df = pd.DataFrame([asdict(data) for data in self.data_buffer])
-            df.to_csv(self.config.onchain_data_file, index=False)
-            print(f"💾 Saved {len(self.data_buffer)} onchain data points")
+            # Get the last data point (most recent)
+            latest_data = self.data_buffer[-1]
+            data_dict = asdict(latest_data)
+            data_dict['timestamp'] = latest_data.timestamp.isoformat()
+            
+            df = pd.DataFrame([data_dict])
+            file_exists = os.path.exists(self.config.onchain_data_file)
+            df.to_csv(self.config.onchain_data_file, mode='a', header=not file_exists, index=False)
+            print(f"💾 Saved 1 onchain data point")
         
-        # Save features
+        # Save features - only save new feature points
         if self.features_buffer:
-            df = pd.DataFrame([asdict(features) for features in self.features_buffer])
-            df.to_csv(self.config.features_file, index=False)
-            print(f"🔍 Saved {len(self.features_buffer)} feature points")
+            # Get the last feature point (most recent)
+            latest_features = self.features_buffer[-1]
+            features_dict = asdict(latest_features)
+            features_dict['timestamp'] = latest_features.timestamp.isoformat()
+            
+            df = pd.DataFrame([features_dict])
+            file_exists = os.path.exists(self.config.features_file)
+            df.to_csv(self.config.features_file, mode='a', header=not file_exists, index=False)
+            print(f"🔍 Saved 1 feature point")
         
-        # Save signals
+        # Save signals - overwrite the entire signals file (keep latest signals)
         if self.signals_buffer:
             signals_data = [asdict(signal) for signal in self.signals_buffer]
+            # Convert timestamps to ISO format
+            for signal in signals_data:
+                if 'timestamp' in signal:
+                    signal['timestamp'] = signal['timestamp'].isoformat()
+            
             with open(self.config.signals_file, 'w') as f:
                 json.dump(signals_data, f, indent=2, default=str)
             print(f"📊 Saved {len(self.signals_buffer)} signals")

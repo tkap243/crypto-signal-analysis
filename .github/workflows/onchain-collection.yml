@@ -34,6 +34,12 @@ jobs:
         mkdir -p data/outputs/reports
         mkdir -p data/outputs/logs
         
+    - name: Check for concurrent runs
+      run: |
+        echo "Checking for concurrent workflow runs..."
+        # Add a small delay to reduce chance of concurrent runs
+        sleep $((RANDOM % 30))
+        
     - name: Run onchain data collection
       run: |
         echo "Starting onchain data collection..."
@@ -74,7 +80,19 @@ jobs:
           echo "No changes to commit"
         else
           git commit -m "Update onchain data - $(date)"
-          git push origin main
+          # Pull latest changes before pushing to avoid conflicts
+          git pull origin main --no-rebase || true
+          # Push with retry logic
+          for i in {1..3}; do
+            if git push origin main; then
+              echo "Successfully pushed data"
+              break
+            else
+              echo "Push attempt $i failed, retrying..."
+              git pull origin main --no-rebase || true
+              sleep 5
+            fi
+          done
         fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -159,7 +159,7 @@ class OnChainApp:
             # Load raw data
             if os.path.exists(self.config.onchain_data_file):
                 df = pd.read_csv(self.config.onchain_data_file)
-                df['timestamp'] = pd.to_datetime(df['timestamp'])
+                df['timestamp'] = pd.to_datetime(df['timestamp'], format='mixed')
                 for _, row in df.iterrows():
                     data = OnChainData(**{k: v for k, v in row.items() if k in OnChainData.__dataclass_fields__})
                     self.data_buffer.append(data)
@@ -168,7 +168,7 @@ class OnChainApp:
             # Load features
             if os.path.exists(self.config.features_file):
                 df = pd.read_csv(self.config.features_file)
-                df['timestamp'] = pd.to_datetime(df['timestamp'])
+                df['timestamp'] = pd.to_datetime(df['timestamp'], format='mixed')
                 for _, row in df.iterrows():
                     features = OnChainFeatures(**{k: v for k, v in row.items() if k in OnChainFeatures.__dataclass_fields__})
                     self.features_buffer.append(features)
@@ -270,61 +270,69 @@ class OnChainApp:
         """Calculate features from onchain data"""
         timestamp = data.timestamp
         
-        # Convert buffer to DataFrame for calculations
-        if len(self.data_buffer) < 2:
+        try:
+            # Convert buffer to DataFrame for calculations
+            if len(self.data_buffer) < 1:
+                print("⚠️  No data in buffer for feature calculation")
+                return OnChainFeatures(timestamp=timestamp, symbol=data.symbol)
+            
+            df = pd.DataFrame([asdict(d) for d in self.data_buffer])
+            df['timestamp'] = pd.to_datetime(df['timestamp'])
+            df = df.sort_values('timestamp')
+            
+            # Mempool congestion features
+            mempool_congestion_score = self._calculate_congestion_score(data)
+            mempool_trend = self._calculate_trend(df, 'mempool_count') if len(df) >= 2 else 0.0
+            mempool_volatility = self._calculate_volatility(df, 'mempool_count') if len(df) >= 2 else 0.0
+            
+            # Fee pressure features
+            fee_pressure_score = self._calculate_fee_pressure_score(data)
+            fee_trend = self._calculate_trend(df, 'fee_30min_satvB') if len(df) >= 2 else 0.0
+            fee_volatility = self._calculate_volatility(df, 'fee_30min_satvB') if len(df) >= 2 else 0.0
+            
+            # Network activity features
+            network_activity_score = self._calculate_network_activity_score(data)
+            network_trend = self._calculate_trend(df, 'bc_transactions') if len(df) >= 2 else 0.0
+            network_volatility = self._calculate_volatility(df, 'bc_transactions') if len(df) >= 2 else 0.0
+            
+            # Block production features
+            block_production_rate = self._calculate_block_production_rate(df) if len(df) >= 2 else 0.0
+            block_size_trend = self._calculate_trend(df, 'tip_size') if len(df) >= 2 else 0.0
+            block_weight_trend = self._calculate_trend(df, 'tip_weight') if len(df) >= 2 else 0.0
+            
+            # Market structure features
+            market_structure_score = self._calculate_market_structure_score(data)
+            liquidity_score = self._calculate_liquidity_score(data)
+            volatility_score = self._calculate_volatility_score(df) if len(df) >= 2 else 0.0
+            
+            features = OnChainFeatures(
+                timestamp=timestamp,
+                symbol=data.symbol,
+                mempool_congestion_score=mempool_congestion_score,
+                mempool_trend=mempool_trend,
+                mempool_volatility=mempool_volatility,
+                fee_pressure_score=fee_pressure_score,
+                fee_trend=fee_trend,
+                fee_volatility=fee_volatility,
+                network_activity_score=network_activity_score,
+                network_trend=network_trend,
+                network_volatility=network_volatility,
+                block_production_rate=block_production_rate,
+                block_size_trend=block_size_trend,
+                block_weight_trend=block_weight_trend,
+                market_structure_score=market_structure_score,
+                liquidity_score=liquidity_score,
+                volatility_score=volatility_score
+            )
+            
+            self.features_buffer.append(features)
+            print(f"🔍 Calculated features for {timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
+            return features
+            
+        except Exception as e:
+            print(f"❌ Error calculating features: {e}")
+            # Return basic features even if calculation fails
             return OnChainFeatures(timestamp=timestamp, symbol=data.symbol)
-        
-        df = pd.DataFrame([asdict(d) for d in self.data_buffer])
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
-        df = df.sort_values('timestamp')
-        
-        # Mempool congestion features
-        mempool_congestion_score = self._calculate_congestion_score(data)
-        mempool_trend = self._calculate_trend(df, 'mempool_count')
-        mempool_volatility = self._calculate_volatility(df, 'mempool_count')
-        
-        # Fee pressure features
-        fee_pressure_score = self._calculate_fee_pressure_score(data)
-        fee_trend = self._calculate_trend(df, 'fee_30min_satvB')
-        fee_volatility = self._calculate_volatility(df, 'fee_30min_satvB')
-        
-        # Network activity features
-        network_activity_score = self._calculate_network_activity_score(data)
-        network_trend = self._calculate_trend(df, 'bc_transactions')
-        network_volatility = self._calculate_volatility(df, 'bc_transactions')
-        
-        # Block production features
-        block_production_rate = self._calculate_block_production_rate(df)
-        block_size_trend = self._calculate_trend(df, 'tip_size')
-        block_weight_trend = self._calculate_trend(df, 'tip_weight')
-        
-        # Market structure features
-        market_structure_score = self._calculate_market_structure_score(data)
-        liquidity_score = self._calculate_liquidity_score(data)
-        volatility_score = self._calculate_volatility_score(df)
-        
-        features = OnChainFeatures(
-            timestamp=timestamp,
-            symbol=data.symbol,
-            mempool_congestion_score=mempool_congestion_score,
-            mempool_trend=mempool_trend,
-            mempool_volatility=mempool_volatility,
-            fee_pressure_score=fee_pressure_score,
-            fee_trend=fee_trend,
-            fee_volatility=fee_volatility,
-            network_activity_score=network_activity_score,
-            network_trend=network_trend,
-            network_volatility=network_volatility,
-            block_production_rate=block_production_rate,
-            block_size_trend=block_size_trend,
-            block_weight_trend=block_weight_trend,
-            market_structure_score=market_structure_score,
-            liquidity_score=liquidity_score,
-            volatility_score=volatility_score
-        )
-        
-        self.features_buffer.append(features)
-        return features
     
     def _calculate_congestion_score(self, data: OnChainData) -> float:
         """Calculate mempool congestion score (0-1)"""
@@ -532,55 +540,71 @@ class OnChainApp:
     
     def save_data(self):
         """Save all data to CSV files"""
-        # Save raw data - only save new data points
-        if self.data_buffer:
-            # Get the last data point (most recent)
-            latest_data = self.data_buffer[-1]
-            data_dict = asdict(latest_data)
-            data_dict['timestamp'] = latest_data.timestamp.isoformat()
+        try:
+            # Save raw data - save all data points (overwrite file)
+            if self.data_buffer:
+                data_list = []
+                for data in self.data_buffer:
+                    data_dict = asdict(data)
+                    data_dict['timestamp'] = data.timestamp.isoformat()
+                    data_list.append(data_dict)
+                
+                df = pd.DataFrame(data_list)
+                df.to_csv(self.config.onchain_data_file, index=False)
+                print(f"💾 Saved {len(self.data_buffer)} onchain data points")
             
-            df = pd.DataFrame([data_dict])
-            file_exists = os.path.exists(self.config.onchain_data_file)
-            df.to_csv(self.config.onchain_data_file, mode='a', header=not file_exists, index=False)
-            print(f"💾 Saved 1 onchain data point")
-        
-        # Save features - only save new feature points
-        if self.features_buffer:
-            # Get the last feature point (most recent)
-            latest_features = self.features_buffer[-1]
-            features_dict = asdict(latest_features)
-            features_dict['timestamp'] = latest_features.timestamp.isoformat()
+            # Save features - save all feature points (overwrite file)
+            if self.features_buffer:
+                features_list = []
+                for features in self.features_buffer:
+                    features_dict = asdict(features)
+                    features_dict['timestamp'] = features.timestamp.isoformat()
+                    features_list.append(features_dict)
+                
+                df = pd.DataFrame(features_list)
+                df.to_csv(self.config.features_file, index=False)
+                print(f"🔍 Saved {len(self.features_buffer)} feature points")
             
-            df = pd.DataFrame([features_dict])
-            file_exists = os.path.exists(self.config.features_file)
-            df.to_csv(self.config.features_file, mode='a', header=not file_exists, index=False)
-            print(f"🔍 Saved 1 feature point")
-        
-        # Save signals - overwrite the entire signals file (keep latest signals)
-        if self.signals_buffer:
-            signals_data = [asdict(signal) for signal in self.signals_buffer]
-            # Convert timestamps to ISO format
-            for signal in signals_data:
-                if 'timestamp' in signal:
-                    signal['timestamp'] = signal['timestamp'].isoformat()
-            
-            with open(self.config.signals_file, 'w') as f:
-                json.dump(signals_data, f, indent=2, default=str)
-            print(f"📊 Saved {len(self.signals_buffer)} signals")
+            # Save signals - overwrite the entire signals file (keep latest signals)
+            if self.signals_buffer:
+                signals_data = [asdict(signal) for signal in self.signals_buffer]
+                # Convert timestamps to ISO format
+                for signal in signals_data:
+                    if 'timestamp' in signal:
+                        signal['timestamp'] = signal['timestamp'].isoformat()
+                
+                with open(self.config.signals_file, 'w') as f:
+                    json.dump(signals_data, f, indent=2, default=str)
+                print(f"📊 Saved {len(self.signals_buffer)} signals")
+                
+        except Exception as e:
+            print(f"❌ Error saving data: {e}")
+            raise
     
     def generate_report(self):
         """Generate analysis report"""
-        if not self.data_buffer or not self.features_buffer:
-            print("⚠️  No data available for report generation")
-            return
-        
-        # Convert to DataFrames
-        data_df = pd.DataFrame([asdict(data) for data in self.data_buffer])
-        features_df = pd.DataFrame([asdict(features) for features in self.features_buffer])
-        
-        # Generate report
-        report = f"""# OnChain Analysis Report
-Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+        try:
+            if not self.data_buffer:
+                print("⚠️  No data available for report generation")
+                return
+            
+            # Convert to DataFrames
+            data_df = pd.DataFrame([asdict(data) for data in self.data_buffer])
+            data_df['timestamp'] = pd.to_datetime(data_df['timestamp'])
+            
+            features_df = pd.DataFrame([asdict(features) for features in self.features_buffer]) if self.features_buffer else pd.DataFrame()
+            if not features_df.empty:
+                features_df['timestamp'] = pd.to_datetime(features_df['timestamp'])
+            
+            # Generate report
+            # Calculate metrics safely
+            avg_mempool = f"{data_df['mempool_count'].mean():.0f}" if not data_df['mempool_count'].isna().all() else 'N/A'
+            avg_fee = f"{data_df['fee_30min_satvB'].mean():.1f}" if not data_df['fee_30min_satvB'].isna().all() else 'N/A'
+            avg_network = f"{features_df['network_activity_score'].mean():.3f}" if not features_df.empty and not features_df['network_activity_score'].isna().all() else 'N/A'
+            avg_market = f"{features_df['market_structure_score'].mean():.3f}" if not features_df.empty and not features_df['market_structure_score'].isna().all() else 'N/A'
+            
+            report = f"""# OnChain Analysis Report
+Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}
 
 ## Data Summary
 - **Data Points**: {len(self.data_buffer)}
@@ -589,47 +613,83 @@ Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
 - **Time Range**: {data_df['timestamp'].min()} to {data_df['timestamp'].max()}
 
 ## Key Metrics
-- **Avg Mempool Count**: {data_df['mempool_count'].mean():.0f}
-- **Avg Fee (30min)**: {data_df['fee_30min_satvB'].mean():.1f} sat/vB
-- **Avg Network Activity**: {features_df['network_activity_score'].mean():.3f}
-- **Avg Market Structure**: {features_df['market_structure_score'].mean():.3f}
+- **Avg Mempool Count**: {avg_mempool}
+- **Avg Fee (30min)**: {avg_fee} sat/vB
+- **Avg Network Activity**: {avg_network}
+- **Avg Market Structure**: {avg_market}
 
 ## Recent Signals
 """
-        
-        # Add recent signals
-        for signal in list(self.signals_buffer)[-5:]:
-            report += f"- **{signal.signal_type}** ({signal.signal_strength:.2f}) - {signal.reasoning}\n"
-        
-        # Save report
-        with open(self.config.report_file, 'w') as f:
-            f.write(report)
-        
-        print(f"📄 Report saved to {self.config.report_file}")
+            
+            # Add recent signals
+            if self.signals_buffer:
+                for signal in list(self.signals_buffer)[-5:]:
+                    report += f"- **{signal.signal_type}** ({signal.signal_strength:.2f}) - {signal.reasoning}\n"
+            else:
+                report += "- No signals generated yet\n"
+            
+            # Save report
+            with open(self.config.report_file, 'w') as f:
+                f.write(report)
+            
+            print(f"📄 Report saved to {self.config.report_file}")
+            
+        except Exception as e:
+            print(f"❌ Error generating report: {e}")
+            # Create a minimal report even if generation fails
+            try:
+                minimal_report = f"""# OnChain Analysis Report
+Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}
+
+## Data Summary
+- **Data Points**: {len(self.data_buffer) if self.data_buffer else 0}
+- **Feature Points**: {len(self.features_buffer) if self.features_buffer else 0}
+- **Signals Generated**: {len(self.signals_buffer) if self.signals_buffer else 0}
+
+## Status
+Report generation encountered an error: {e}
+"""
+                with open(self.config.report_file, 'w') as f:
+                    f.write(minimal_report)
+                print(f"📄 Minimal report saved to {self.config.report_file}")
+            except Exception as e2:
+                print(f"❌ Failed to save minimal report: {e2}")
     
     def run_single_analysis(self):
         """Run single onchain analysis"""
         print("🔍 Running single onchain analysis...")
         
-        # Collect data
-        data = self.collect_data()
-        print(f"📊 Collected data: mempool={data.mempool_count}, fee={data.fee_30min_satvB} sat/vB")
-        
-        # Calculate features
-        features = self.calculate_features(data)
-        print(f"🔍 Calculated features: congestion={features.mempool_congestion_score:.3f}, pressure={features.fee_pressure_score:.3f}")
-        
-        # Generate signal
-        signal = self.generate_signal(features)
-        print(f"📊 Generated signal: {signal.signal_type} ({signal.signal_strength:.2f}) - {signal.reasoning}")
-        
-        # Save data
-        self.save_data()
-        
-        # Generate report
-        self.generate_report()
-        
-        print("✅ Single onchain analysis completed")
+        try:
+            # Collect data
+            data = self.collect_data()
+            print(f"📊 Collected data: mempool={data.mempool_count}, fee={data.fee_30min_satvB} sat/vB")
+            
+            # Calculate features
+            features = self.calculate_features(data)
+            print(f"🔍 Calculated features: congestion={features.mempool_congestion_score:.3f}, pressure={features.fee_pressure_score:.3f}")
+            
+            # Generate signal
+            signal = self.generate_signal(features)
+            print(f"📊 Generated signal: {signal.signal_type} ({signal.signal_strength:.2f}) - {signal.reasoning}")
+            
+            # Save data
+            self.save_data()
+            
+            # Generate report
+            self.generate_report()
+            
+            print("✅ Single onchain analysis completed")
+            
+        except Exception as e:
+            print(f"❌ Error in onchain analysis: {e}")
+            # Try to save whatever data we have
+            try:
+                self.save_data()
+                self.generate_report()
+                print("💾 Saved partial data despite error")
+            except Exception as save_error:
+                print(f"❌ Failed to save partial data: {save_error}")
+            raise
     
     def start_continuous_collection(self):
         """Start continuous data collection"""

@@ -36,7 +36,23 @@ jobs:
         
     - name: Run onchain data collection
       run: |
+        echo "Starting onchain data collection..."
         python scripts/run_onchain.py single
+        echo "Onchain data collection completed"
+      continue-on-error: false
+        
+    - name: Verify data collection
+      run: |
+        echo "Verifying collected data..."
+        echo "Raw data file:"
+        ls -la data/raw/onchain_data.csv || echo "Raw data file not found"
+        echo "Features file:"
+        ls -la data/processed/onchain_features.csv || echo "Features file not found"
+        echo "Signals file:"
+        ls -la data/outputs/onchain_signals.json || echo "Signals file not found"
+        echo "Report file:"
+        ls -la data/outputs/reports/onchain_report.md || echo "Report file not found"
+        echo "Data verification completed"
         
     - name: Upload OnChain Data Artifacts
       uses: actions/upload-artifact@v4

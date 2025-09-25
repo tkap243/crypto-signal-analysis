@@ -1,2 +1,2 @@
 timestamp,symbol,mempool_congestion_score,mempool_trend,mempool_volatility,fee_pressure_score,fee_trend,fee_volatility,network_activity_score,network_trend,network_volatility,block_production_rate,block_size_trend,block_weight_trend,market_structure_score,liquidity_score,volatility_score
-2025-09-25T20:08:11.104063+00:00,BTC/USDT,1.0,0.0,0.0,0.3,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.79,0.0,0.0
+2025-09-25T20:18:22.043343+00:00,BTC/USDT,1.0,0.0,0.0,0.1,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.73,0.0,0.0

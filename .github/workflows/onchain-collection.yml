@@ -1,0 +1,101 @@
+name: OnChain Data Collection
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Every 15 minutes
+  workflow_dispatch:  # Manual trigger option
+
+permissions:
+  contents: write
+
+jobs:
+  collect-onchain-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10  # Prevent long-running jobs
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Create data directories
+      run: |
+        mkdir -p data/raw
+        mkdir -p data/processed
+        mkdir -p data/outputs/reports
+        mkdir -p data/outputs/logs
+        
+    - name: Run onchain data collection
+      run: |
+        python scripts/run_onchain.py single
+        
+    - name: Upload OnChain Data Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: onchain-data-${{ github.run_number }}
+        path: |
+          data/raw/onchain_data.csv
+          data/processed/onchain_features.csv
+          data/outputs/onchain_signals.json
+          data/outputs/reports/onchain_report.md
+        retention-days: 30  # Keep artifacts for 30 days
+        
+    - name: Commit and push data
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update onchain data - $(date)"
+          git push origin main
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  continuous-collection:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'  # Only run on manual trigger
+    timeout-minutes: 60  # Allow longer runs for continuous collection
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Create data directories
+      run: |
+        mkdir -p data/raw data/processed data/outputs/reports data/outputs/logs data/archive
+        
+    - name: Run Continuous OnChain Collection
+      run: |
+        timeout 45m python scripts/run_onchain.py continuous
+        
+    - name: Upload Continuous Collection Data
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuous-onchain-data-${{ github.run_number }}
+        path: |
+          data/raw/
+          data/processed/
+          data/outputs/
+        retention-days: 7

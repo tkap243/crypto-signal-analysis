@@ -1,0 +1,70 @@
+name: OnChain Extended Collection
+
+on:
+  workflow_dispatch:  # Manual trigger only
+    inputs:
+      duration:
+        description: 'Duration in minutes (default: 60)'
+        required: false
+        default: '60'
+        type: string
+      interval:
+        description: 'Collection interval in seconds (default: 15)'
+        required: false
+        default: '15'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  extended-onchain-collection:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120  # Allow up to 2 hours for extended collection
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Create data directories
+      run: |
+        mkdir -p data/raw data/processed data/outputs/reports data/outputs/logs data/archive
+        
+    - name: Run Extended OnChain Collection
+      run: |
+        python scripts/run_onchain.py extended --duration ${{ github.event.inputs.duration || '60' }} --interval ${{ github.event.inputs.interval || '15' }}
+        
+    - name: Upload Extended Collection Data
+      uses: actions/upload-artifact@v4
+      with:
+        name: extended-onchain-data-${{ github.run_number }}
+        path: |
+          data/raw/onchain_data.csv
+          data/processed/onchain_features.csv
+          data/outputs/onchain_signals.json
+          data/outputs/reports/onchain_report.md
+        retention-days: 7
+        
+    - name: Commit and push data
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update onchain data (extended collection) - $(date)"
+          git push origin main
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

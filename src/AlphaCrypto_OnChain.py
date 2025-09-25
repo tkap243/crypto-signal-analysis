@@ -552,35 +552,31 @@ class OnChainApp:
     def save_data(self):
         """Save all data to CSV files"""
         try:
-            # Save raw data - append new data points
+            # Save raw data - only save the most recent data point
             if self.data_buffer:
-                # Get only new data points (not already saved)
-                new_data_points = []
-                for data in self.data_buffer:
-                    data_dict = asdict(data)
-                    data_dict['timestamp'] = data.timestamp.isoformat()
-                    new_data_points.append(data_dict)
+                # Get only the latest data point (the one just collected)
+                latest_data = self.data_buffer[-1]
+                data_dict = asdict(latest_data)
+                data_dict['timestamp'] = latest_data.timestamp.isoformat()
                 
                 # Append to CSV file
-                df = pd.DataFrame(new_data_points)
+                df = pd.DataFrame([data_dict])
                 file_exists = os.path.exists(self.config.onchain_data_file)
                 df.to_csv(self.config.onchain_data_file, mode='a', header=not file_exists, index=False)
-                print(f"💾 Saved {len(new_data_points)} new onchain data points")
+                print(f"💾 Saved 1 new onchain data point")
             
-            # Save features - append new feature points
+            # Save features - only save the most recent feature point
             if self.features_buffer:
-                # Get only new feature points (not already saved)
-                new_features_points = []
-                for features in self.features_buffer:
-                    features_dict = asdict(features)
-                    features_dict['timestamp'] = features.timestamp.isoformat()
-                    new_features_points.append(features_dict)
+                # Get only the latest feature point (the one just calculated)
+                latest_features = self.features_buffer[-1]
+                features_dict = asdict(latest_features)
+                features_dict['timestamp'] = latest_features.timestamp.isoformat()
                 
                 # Append to CSV file
-                df = pd.DataFrame(new_features_points)
+                df = pd.DataFrame([features_dict])
                 file_exists = os.path.exists(self.config.features_file)
                 df.to_csv(self.config.features_file, mode='a', header=not file_exists, index=False)
-                print(f"🔍 Saved {len(new_features_points)} new feature points")
+                print(f"🔍 Saved 1 new feature point")
             
             # Save signals - overwrite the entire signals file (keep latest signals)
             if self.signals_buffer:

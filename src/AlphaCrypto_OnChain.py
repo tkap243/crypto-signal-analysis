@@ -156,19 +156,29 @@ class OnChainApp:
     def _load_existing_data(self):
         """Load existing data from CSV files"""
         try:
-            # Load raw data
+            # Check if running in GitHub Actions
+            is_github_actions = os.getenv('GITHUB_ACTIONS') == 'true'
+            
+            if is_github_actions:
+                print(f"🔄 GitHub Actions detected - starting with fresh data")
+                # In GitHub Actions, start fresh to avoid old data issues
+                return
+            
+            # Load raw data (only when not in GitHub Actions)
             if os.path.exists(self.config.onchain_data_file):
                 df = pd.read_csv(self.config.onchain_data_file)
                 df['timestamp'] = pd.to_datetime(df['timestamp'], format='mixed')
+                
                 for _, row in df.iterrows():
                     data = OnChainData(**{k: v for k, v in row.items() if k in OnChainData.__dataclass_fields__})
                     self.data_buffer.append(data)
                 print(f"📊 Loaded {len(self.data_buffer)} existing onchain data points")
             
-            # Load features
+            # Load features (only when not in GitHub Actions)
             if os.path.exists(self.config.features_file):
                 df = pd.read_csv(self.config.features_file)
                 df['timestamp'] = pd.to_datetime(df['timestamp'], format='mixed')
+                
                 for _, row in df.iterrows():
                     features = OnChainFeatures(**{k: v for k, v in row.items() if k in OnChainFeatures.__dataclass_fields__})
                     self.features_buffer.append(features)

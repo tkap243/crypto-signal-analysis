@@ -165,10 +165,7 @@ class OnChainApp:
                 df['timestamp'] = pd.to_datetime(df['timestamp'], format='mixed')
                 
                 if is_github_actions:
-                    # In GitHub Actions, load only recent data (last 24 hours) for feature calculations
-                    cutoff_time = datetime.now(timezone.utc) - timedelta(hours=24)
-                    df = df[df['timestamp'] >= cutoff_time]
-                    print(f"🔄 GitHub Actions detected - loading recent data (last 24 hours)")
+                    print(f"🔄 GitHub Actions detected - loading all historical data for feature calculations")
                 
                 for _, row in df.iterrows():
                     data = OnChainData(**{k: v for k, v in row.items() if k in OnChainData.__dataclass_fields__})
@@ -181,9 +178,7 @@ class OnChainApp:
                 df['timestamp'] = pd.to_datetime(df['timestamp'], format='mixed')
                 
                 if is_github_actions:
-                    # In GitHub Actions, load only recent features (last 24 hours)
-                    cutoff_time = datetime.now(timezone.utc) - timedelta(hours=24)
-                    df = df[df['timestamp'] >= cutoff_time]
+                    print(f"🔄 GitHub Actions detected - loading all historical features")
                 
                 for _, row in df.iterrows():
                     features = OnChainFeatures(**{k: v for k, v in row.items() if k in OnChainFeatures.__dataclass_fields__})

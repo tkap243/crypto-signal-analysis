@@ -1,14 +1,16 @@
 [
   {
-    "timestamp": "2025-10-19T05:54:28.012433+00:00",
+    "timestamp": "2025-10-19T06:32:50.247398+00:00",
     "symbol": "BTC/USDT",
-    "signal_type": "NEUTRAL",
-    "signal_strength": 0.1,
-    "confidence": 0.30000000000000004,
-    "reasoning": "Low fee pressure; High network activity",
+    "signal_type": "BULLISH",
+    "signal_strength": 0.7,
+    "confidence": 0.7,
+    "reasoning": "High mempool congestion; Low fee pressure; High network activity; Strong market structure",
     "features_used": [
+      "mempool_congestion_score",
       "fee_pressure_score",
-      "network_activity_score"
+      "network_activity_score",
+      "market_structure_score"
     ],
     "prediction_hours": 1.0
   }

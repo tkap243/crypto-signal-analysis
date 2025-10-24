@@ -1,13 +1,13 @@
 # Derivative Signal Report
 
-**Timestamp:** 2025-10-24 12:24:15 UTC  
+**Timestamp:** 2025-10-24 16:15:03 UTC  
 **Symbol:** BTC/USDT  
 **Prediction Window:** 1.0 hours  
 **Direction:** **NEUTRAL**  
 **Confidence:** 0.30
 
 ## Futures Analysis
-- **Average Basis:** 0.0001 (0.006%)
+- **Average Basis:** -0.0001 (-0.010%)
 - **Basis Volatility:** 0.0000
 - **Basis Momentum:** 0.0000
 - **OI Change 24h:** 0.00
@@ -15,10 +15,10 @@
 - **Volume Ratio:** 1.00
 
 ## Funding Rate Analysis
-- **Average Funding Rate:** 0.000011 (0.0011%)
-- **Funding Volatility:** 0.000075
-- **Funding Momentum:** -0.000150
-- **Funding Spread:** 0.000150
+- **Average Funding Rate:** -0.000025 (-0.0025%)
+- **Funding Volatility:** 0.000039
+- **Funding Momentum:** -0.000078
+- **Funding Spread:** 0.000078
 
 ## Options Analysis
 - **Put/Call Ratio:** 1.00
@@ -27,7 +27,7 @@
 
 ## Composite Analysis
 - **Derivative Sentiment:** 0.001
-- **Derivative Confidence:** 0.003
+- **Derivative Confidence:** 0.001
 - **Market Structure Score:** 1.000
 
 ## Reasoning

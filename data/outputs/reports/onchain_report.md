@@ -1,17 +1,17 @@
 # OnChain Analysis Report
-Generated: 2025-10-27 14:26:24 UTC
+Generated: 2025-10-27 14:54:06 UTC
 
 ## Data Summary
 - **Data Points**: 96
 - **Feature Points**: 96
 - **Signals Generated**: 1
-- **Time Range**: 2025-10-25 19:53:05.903638+00:00 to 2025-10-27 14:26:22.861050+00:00
+- **Time Range**: 2025-10-25 20:24:21.517484+00:00 to 2025-10-27 14:54:04.613328+00:00
 
 ## Key Metrics
-- **Avg Mempool Count**: 61756
+- **Avg Mempool Count**: 62623
 - **Avg Fee (30min)**: 1.1 sat/vB
 - **Avg Network Activity**: 1.000
-- **Avg Market Structure**: 0.660
+- **Avg Market Structure**: 0.661
 
 ## Recent Signals
 - **BULLISH** (0.70) - High mempool congestion; Low fee pressure; High network activity; Strong market structure

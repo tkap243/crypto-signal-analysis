@@ -1,28 +1,28 @@
 {
-  "timestamp": "2025-10-27T08:18:03.194542+00:00",
+  "timestamp": "2025-10-27T12:24:14.501678+00:00",
   "symbol": "BTC/USDT",
   "prediction_hours": 1.0,
   "direction": "neutral",
   "confidence": 0.3,
   "features": {
-    "timestamp": "2025-10-27T08:18:03.194542+00:00",
+    "timestamp": "2025-10-27T12:24:14.501678+00:00",
     "symbol": "BTC/USDT",
-    "avg_basis": -0.0001524271424241616,
+    "avg_basis": -0.0002508147138845834,
     "basis_volatility": 0.0,
     "basis_momentum": 0.0,
     "oi_change_24h": 0.0,
     "oi_momentum": 0.0,
     "volume_ratio": 1.0,
-    "avg_funding_rate": 2.8131349525400002e-05,
-    "funding_rate_volatility": 3.11313495254e-05,
-    "funding_rate_momentum": -6.22626990508e-05,
-    "funding_rate_spread": 6.22626990508e-05,
+    "avg_funding_rate": 3.9500000000000005e-05,
+    "funding_rate_volatility": 6.050000000000001e-05,
+    "funding_rate_momentum": -0.000121,
+    "funding_rate_spread": 0.000121,
     "put_call_ratio": 1.0,
     "implied_vol": 0.0,
     "vol_skew": 0.0,
-    "derivative_sentiment": -0.01910625302064578,
-    "derivative_confidence": 0.03821250604129156,
-    "market_structure_score": 0.9999844343252373
+    "derivative_sentiment": -0.02939719016113524,
+    "derivative_confidence": 0.05879438032227048,
+    "market_structure_score": 0.99996975
   },
-  "reasoning": "Score: 0.025. derivative_sentiment: -0.019 (bearish); put_call_ratio: 1.000 (bullish)"
+  "reasoning": "Score: 0.023. derivative_sentiment: -0.029 (bearish); put_call_ratio: 1.000 (bullish)"
 }

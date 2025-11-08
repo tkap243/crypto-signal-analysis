@@ -1,14 +1,13 @@
 [
   {
-    "timestamp": "2025-11-08T16:26:57.684523+00:00",
+    "timestamp": "2025-11-08T16:45:22.375905+00:00",
     "symbol": "BTC/USDT",
-    "signal_type": "BULLISH",
-    "signal_strength": 0.5,
-    "confidence": 0.4,
-    "reasoning": "High network activity; Strong market structure",
+    "signal_type": "NEUTRAL",
+    "signal_strength": 0.2,
+    "confidence": 0.2,
+    "reasoning": "High network activity",
     "features_used": [
-      "network_activity_score",
-      "market_structure_score"
+      "network_activity_score"
     ],
     "prediction_hours": 1.0
   }

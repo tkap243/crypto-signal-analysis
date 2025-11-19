@@ -1,11 +1,11 @@
 # OnChain Analysis Report
-Generated: 2025-11-19 19:40:21 UTC
+Generated: 2025-11-19 19:52:56 UTC
 
 ## Data Summary
 - **Data Points**: 96
 - **Feature Points**: 96
 - **Signals Generated**: 1
-- **Time Range**: 2025-11-17 21:22:27.576032+00:00 to 2025-11-19 19:40:18.741736+00:00
+- **Time Range**: 2025-11-17 21:41:58.302721+00:00 to 2025-11-19 19:52:54.388598+00:00
 
 ## Key Metrics
 - **Avg Mempool Count**: 43192

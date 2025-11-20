@@ -1,14 +1,14 @@
 # OnChain Analysis Report
-Generated: 2025-11-20 15:57:39 UTC
+Generated: 2025-11-20 16:36:29 UTC
 
 ## Data Summary
 - **Data Points**: 96
 - **Feature Points**: 96
 - **Signals Generated**: 1
-- **Time Range**: 2025-11-18 18:58:53.007271+00:00 to 2025-11-20 15:57:37.603265+00:00
+- **Time Range**: 2025-11-18 19:23:25.215853+00:00 to 2025-11-20 16:36:27.576375+00:00
 
 ## Key Metrics
-- **Avg Mempool Count**: 41027
+- **Avg Mempool Count**: 41006
 - **Avg Fee (30min)**: 1.7 sat/vB
 - **Avg Network Activity**: 1.000
 - **Avg Market Structure**: 0.701
